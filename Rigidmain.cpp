@@ -6924,6 +6924,8 @@ void CMyD3DApplication::UpdateInput( UserInput* pUserInput )
     for( i=0; i<dwNumDevices; i++ )
     {
         InputDeviceState* pInputDeviceState = (InputDeviceState*) pDeviceInfos[i].pParam;
+		if (!pInputDeviceState)
+			continue;
 		
         // Use the axis data that is furthest from zero
         if( fabs(pInputDeviceState->fAxisRotateLR) > fabs(pUserInput->fAxisRotateLR) )
@@ -8509,7 +8511,8 @@ VOID CMyD3DApplication::Pause( BOOL bPause )
     for( DWORD i=0; i<dwNumDevices; i++ )
     {
         InputDeviceState* pInputDeviceState = (InputDeviceState*) pDeviceInfos[i].pParam;
-        ZeroMemory( pInputDeviceState, sizeof(InputDeviceState) );
+		if (pInputDeviceState)
+			ZeroMemory( pInputDeviceState, sizeof(InputDeviceState) );
     }
 
     CD3DApplication::Pause( bPause );

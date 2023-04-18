@@ -290,7 +290,10 @@ HRESULT CInputDeviceManager::ConfigureDevices( HWND hWnd, IUnknown* pSurface,
     hr = m_pDI->ConfigureDevices( (LPDICONFIGUREDEVICESCALLBACK)ConfigureDevicesCB, 
                                   &dicdp, dwFlags, pvCBParam );
     if( FAILED(hr) )
+    {
+        MessageBox(hWnd, "Failed to open configure devices menu. Not supported on your system.", "Error", MB_OK | MB_ICONERROR);
         return hr;
+    }
 
     if( dwFlags & DICD_EDIT )
     {
