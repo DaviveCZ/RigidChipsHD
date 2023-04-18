@@ -1286,7 +1286,7 @@ GWorld::GWorld(GFloat steptime,int substep)
 	MainStepCount=0;
 	ChipCount=0;
 	ObjectCount=0;
-	G=GVector(0,-9.807f,0);
+	G=GVector(0, GDEFAULT_GRAVITY,0);
 	for(int i=0;i<GCHIPMAX;i++) {
 		Rigid[i]=NULL;
 		RecRigid[i]=NULL;

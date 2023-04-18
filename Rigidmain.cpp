@@ -8524,7 +8524,7 @@ void CMyD3DApplication::SetRegulationMenu() {
 	HMENU hMenu = GetMenu( m_hWnd );
 	if(GravityFlag) {
 		CheckMenuItem(hMenu,IDM_GRAVITY,MF_CHECKED);
-		World->G=GVector(0,-9.807f,0);
+		World->G=GVector(0, GDEFAULT_GRAVITY,0);
 	}
 	else {
 		CheckMenuItem(hMenu,IDM_GRAVITY,MF_UNCHECKED);
@@ -8894,7 +8894,7 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT msg, WPARAM wParam,
                     GravityFlag = !GravityFlag;
 					if(GravityFlag) {
 						CheckMenuItem(hMenu,IDM_GRAVITY,MF_CHECKED);
-						World->G=GVector(0,-9.807f,0);
+						World->G=GVector(0, GDEFAULT_GRAVITY,0);
 						
 					}
 					else {
