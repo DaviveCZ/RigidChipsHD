@@ -292,6 +292,9 @@ HRESULT CInputDeviceManager::ConfigureDevices( HWND hWnd, IUnknown* pSurface,
     if( FAILED(hr) )
     {
         MessageBox(hWnd, "Failed to open configure devices menu. Not supported on your system.", "Error", MB_OK | MB_ICONERROR);
+        hr = SetActionFormat(m_diaf, TRUE);
+        if (FAILED(hr))
+            return hr;
         return hr;
     }
 
