@@ -16,6 +16,7 @@
 #include "D3DUtil.h"
 #include "DXUtil.h"
 #include "D3DRes.h"
+#include "Rigidmain.h"
 
 //-----------------------------------------------------------------------------
 // Global access to the app (needed for the global WndProc())
