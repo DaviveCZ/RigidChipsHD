@@ -20,7 +20,7 @@
 #define GDESTROY_K 0.3f
 
 //#define GDEFAULT_GRAVITY -9.807f
-#define GDEFAULT_GRAVITY -9.807f
+#define GDEFAULT_GRAVITY -15.807f
 
 class GWorld;
 class GRigid;

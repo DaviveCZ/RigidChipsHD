@@ -289,8 +289,8 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&About",                      IDM_SHOWABOUT
-        MENUITEM SEPARATOR
-        MENUITEM "Web Help",                    IDM_WEBHELP
+        //MENUITEM SEPARATOR
+        //MENUITEM "Web Help",                    IDM_WEBHELP
         MENUITEM SEPARATOR
         MENUITEM "Show &Meter",                 IDM_SHOWMETER, CHECKED
         MENUITEM "Show &Regulation",            IDM_SHOWREGULATION, CHECKED
