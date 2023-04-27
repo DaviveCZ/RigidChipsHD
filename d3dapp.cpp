@@ -689,6 +689,13 @@ LRESULT CD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             }
             break;
 
+        case WM_MOUSEWHEEL:
+            //LastScroll = Scroll;
+            Scroll = GET_WHEEL_DELTA_WPARAM(wParam);
+            //ScrollD = Scroll - LastScroll;
+
+            break;
+
        case WM_ENTERMENULOOP:
             // Pause the app when menus are displayed
             Pause(TRUE);
