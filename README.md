@@ -1,4 +1,4 @@
-![Logo](https://user-images.githubusercontent.com/51233566/233988946-f9ad2f9e-b2f0-4b0a-b464-e575d6dbe896.png)
+![Title](https://user-images.githubusercontent.com/51233566/235102152-2e90884e-7922-40ae-bf50-46e924754e3d.png)
 
 An attempt at improving graphics for Rigidchips to make it look similar to Panekit while making Quality of Life fixes.
 
