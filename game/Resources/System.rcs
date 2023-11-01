@@ -1,0 +1,12 @@
+WindLevel=0
+LastBall=-1
+
+function OnFrame()
+end
+
+function OnInit()
+end
+
+function OnReset()
+
+end
