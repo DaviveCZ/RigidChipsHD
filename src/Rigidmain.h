@@ -22,7 +22,7 @@
 #include "D3DUtil.h"
 #include "DIUtil.h"
 //#include "DMUtil.h"
-#include "DSUtil.h"
+#include "audio/DSUtil.h"
 #include "DXUtil.h"
 #include "D3Dtypes.h"
 #include "GVector.hpp"

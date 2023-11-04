@@ -18,6 +18,7 @@
 #include "luaSystem.hpp"
 #include "GDPlay.hpp"
 #include "GPlayers.h"
+#include "audio/audioManager.h"
 
 #define sntprintf snprintf
 
@@ -194,8 +195,6 @@ LPDIRECT3DTEXTURE8 pMyTexture[GTEXMAX] ;
 
 GValList ValList[GVALMAX];
 GKeyList KeyList[GKEYMAX];
-
-HMIDIOUT hMidiOut;
 
 GWorld *World;
 GRigid *Chip[GCHIPMAX];
@@ -3563,21 +3562,8 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	
     // Initialize audio
 //    InitAudio( m_hWnd );
-	hMidiOut=NULL;
 	if(SoundType==1) {
-		long msg;
-		if(midiOutOpen(&hMidiOut, (UINT) MIDI_MAPPER, NULL, 0, 0)==0){
-			//GMシステム・オン
-			//音色を変える(0xCn,音色,0x00)  nはチャンネル(0～0xF)
-			msg	= MAKELONG(MAKEWORD(0xC0,0x7D),MAKEWORD(0x00,0));
-			midiOutShortMsg(hMidiOut, msg); // Note On
-			msg	= MAKELONG(MAKEWORD(0xC1,0x7E),MAKEWORD(0x00,0));
-			midiOutShortMsg(hMidiOut, msg); // Note On
-			msg	= MAKELONG(MAKEWORD(0xB1,0x07),MAKEWORD(0x00,0));
-			midiOutShortMsg(hMidiOut, msg); // Note On
-			msg	= MAKELONG(MAKEWORD(0x91,70),MAKEWORD(0x3f,0));
-			midiOutShortMsg(hMidiOut, msg); // Note On
-		}
+		AUDIO->Initialize();
 	}
 	GravityFlag=true;
 	AirFlag=true;
@@ -6386,8 +6372,7 @@ if( win == FALSE )
 						default:dir=GVector(0,0,1);break;
 					}
 
-					long msg = MAKELONG(MAKEWORD(0x99, 37), MAKEWORD(100, 0));
-					midiOutShortMsg(hMidiOut, msg); // Note On
+                    AUDIO->sendMIDIEvent(0x99, 37, 100);
 
 					GVector d=dir*Chip[i]->R;
 					Chip[i]->ApplyForce(-d*Chip[i]->ArmEnergy*s,Chip[i]->X);
@@ -6533,20 +6518,19 @@ if( win == FALSE )
 			}
 		}
 		//Engine sound
-		if(hMidiOut!=NULL && SoundType==1) {
+		if(SoundType==1) {
 			if(TotalPower>0.1f) {
 				if(!preSound) {
-					//音を鳴らす(0x9n,音程,強さ,0) nはチャンネル(0～0xF)
-					long msg	= MAKELONG(MAKEWORD(0x90,80),MAKEWORD(0x1f,0));
-					midiOutShortMsg(hMidiOut, msg); // Note On
+                    // Play a sound (0x9n, pitch, strength, 0) n is the channel (0 to 0xF)
+                    AUDIO->sendMIDIEvent(0x90, 80, 0x1f); // Note On
 				}
 				preSound=true;
 			}
 			else {
 		//		m_fSoundPlayRepeatCountdown=0.0f;
-				//音を止める(0x9n,音程,00,0) nはチャンネル(0～0xF) 
-				long msg	= MAKELONG(MAKEWORD(0x90,80),MAKEWORD(0x00,0));
-				midiOutShortMsg(hMidiOut, msg); // Note Off
+
+                // Stop the sound (0x9n, pitch, 00,0) n is the channel (0 to 0xF)
+                AUDIO->sendMIDIEvent(0x90, 80, 0); // Note Off
 				preSound=false;
 			}
 		}
@@ -6572,7 +6556,7 @@ if( win == FALSE )
 				DPlay->SendTo(DPNID_ALL_PLAYERS_GROUP,(BYTE*)&stream,sz,60, DPNSEND_NOLOOPBACK|DPNSEND_NOCOMPLETE );
 			}
 		}
-		if(hMidiOut!=NULL && SoundType==1) {
+		if(SoundType==1) {
 
 			soundCount--;
 			if(soundCount<0) soundCount=0;
@@ -6581,10 +6565,8 @@ if( win == FALSE )
 					int db=(int)(Chip[0]->MaxImpulse/3.0f+0.5f);
 					if(db>0x7f) db=0x7f;
 					if(db>2) {
-						long msg	= MAKELONG(MAKEWORD(0x99,35),MAKEWORD(db,0));
-						midiOutShortMsg(hMidiOut, msg); // Note On
-						msg	= MAKELONG(MAKEWORD(0x99,42),MAKEWORD((db*2/5),0));
-						midiOutShortMsg(hMidiOut, msg); // Note On
+                        AUDIO->sendMIDIEvent(0x99, 35, db); // Note On
+                        AUDIO->sendMIDIEvent(0x99, 42, db * 2 / 5); // Note On
 						soundCount=2;
 					}
 		//		}
@@ -7492,21 +7474,19 @@ HRESULT CMyD3DApplication::Render()
 					if(k>=GPARTMAX) break;
 				}
 			}
-			if(hMidiOut!=NULL && SoundType==1) {
+			if(SoundType==1) {
 				long msg;
 				static int preSoundValue=0;
 				if(nFlag) {
 					soundValue=(int)(0x4f*(noiseMax-0.6f));
 					if(soundValue!=preSoundValue) {
-						msg	= MAKELONG(MAKEWORD(0xB1,0x07),MAKEWORD(soundValue,0));
-						midiOutShortMsg(hMidiOut, msg); // Note On
+                        AUDIO->sendMIDIEvent(0xB1, 0x07, soundValue);
 						preSoundValue=soundValue;
 
 					}
 				}
 				else {
-					msg	= MAKELONG(MAKEWORD(0xB1,0x07),MAKEWORD(0x00,0));
-					midiOutShortMsg(hMidiOut, msg); // Note On
+                    AUDIO->sendMIDIEvent(0xB1, 0x07, 0);
 					preSoundValue=0;
 				}
 			}
@@ -8792,30 +8772,12 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT msg, WPARAM wParam,
 					HMENU hMenu = GetMenu( hWnd );
 					if(SoundType) {
 						CheckMenuItem(hMenu,IDM_SETTING_SOUND,MF_CHECKED);
-						long msg;
-						if(hMidiOut){
-								midiOutClose(hMidiOut);
-								hMidiOut=NULL;
-						}
-						if(midiOutOpen(&hMidiOut, (UINT) MIDI_MAPPER, NULL, 0, 0)==0){
-							//GMシステム・オン
-							//音色を変える(0xCn,音色,0x00)  nはチャンネル(0～0xF)
-							msg	= MAKELONG(MAKEWORD(0xC0,0x7D),MAKEWORD(0x00,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-							msg	= MAKELONG(MAKEWORD(0xC1,0x7E),MAKEWORD(0x00,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-							msg	= MAKELONG(MAKEWORD(0xB1,0x07),MAKEWORD(0x00,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-							msg	= MAKELONG(MAKEWORD(0x91,70),MAKEWORD(0x3f,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-						}
+
+                        AUDIO->Initialize();
 					}
 					else {
 						CheckMenuItem(hMenu,IDM_SETTING_SOUND,MF_UNCHECKED);
-						if(hMidiOut){
-								midiOutClose(hMidiOut);
-								hMidiOut=NULL;
-						}
+                        AUDIO->Destroy();
 					}
 					break;
 				}
@@ -8939,23 +8901,7 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT msg, WPARAM wParam,
 					if(SoundType==0) {
 						SoundType=1;
 						CheckMenuItem(hMenu,IDM_SETTING_SOUND,MF_CHECKED);
-						long msg;
-						if(hMidiOut){
-								midiOutClose(hMidiOut);
-								hMidiOut=NULL;
-						}
-						if(midiOutOpen(&hMidiOut, (UINT) MIDI_MAPPER, NULL, 0, 0)==0){
-							//GMシステム・オン
-							//音色を変える(0xCn,音色,0x00)  nはチャンネル(0～0xF)
-							msg	= MAKELONG(MAKEWORD(0xC0,0x7D),MAKEWORD(0x00,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-							msg	= MAKELONG(MAKEWORD(0xC1,0x7E),MAKEWORD(0x00,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-							msg	= MAKELONG(MAKEWORD(0xB1,0x07),MAKEWORD(0x00,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-							msg	= MAKELONG(MAKEWORD(0x91,70),MAKEWORD(0x3f,0));
-							midiOutShortMsg(hMidiOut, msg); // Note On
-						}
+						AUDIO->Initialize();
 					}
 					ShowShadowFlag = 1;
 					CheckMenuItem(hMenu,IDM_SHOWSHADOW,MF_CHECKED);
@@ -9693,10 +9639,7 @@ HRESULT CMyD3DApplication::FinalCleanup()
     // Write the settings to the registry
     WriteSettings();
 	SetCurrentDirectory(AppDir);
-	if(hMidiOut){
-			midiOutClose(hMidiOut);
-			hMidiOut=NULL;
-	}
+	AUDIO->Destroy();
 
 	if(ScriptSource) delete ScriptSource;
 	if(SystemSource) delete SystemSource;

@@ -11,8 +11,9 @@ set(SRC_MAIN
     d3dfont.cpp
     d3dutil.cpp
     diutil.cpp
-    dmutil.cpp
-    dsutil.cpp
+    audio/audioManager.cpp
+    audio/dmutil.cpp
+    audio/dsutil.cpp
     dxutil.cpp
     GRigid.cpp
     GSocket.cpp
@@ -35,8 +36,9 @@ set(SRC_MAIN
     d3dres.h
     d3dutil.h
     diutil.h
-    dmutil.h
-    dsutil.h
+    audio/audioManager.h
+    audio/dmutil.h
+    audio/dsutil.h
     dxutil.h
     GDPlay.hpp
     GLand.hpp
@@ -53,9 +55,13 @@ set(SRC_MAIN
     readData.hpp
     readLand.hpp
     readSub.hpp
+
+    # Resources
+    res/Rigid.rc
 )
 
 add_executable(RigidChipsHD WIN32 ${SRC_MAIN})
+target_include_directories(RigidChipsHD PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # DirectX
 target_include_directories(RigidChipsHD PRIVATE ${CMAKE_SOURCE_DIR}/libs/dx9sdk/include)
