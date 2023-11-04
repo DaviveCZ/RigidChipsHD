@@ -37,6 +37,7 @@ set(SRC_MAIN
     d3dutil.h
     diutil.h
     audio/audioManager.h
+    audio/midiUtil.h
     audio/dmutil.h
     audio/dsutil.h
     dxutil.h

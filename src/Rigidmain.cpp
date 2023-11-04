@@ -6372,7 +6372,7 @@ if( win == FALSE )
 						default:dir=GVector(0,0,1);break;
 					}
 
-                    AUDIO->sendMIDIEvent(0x99, 37, 100);
+                    AUDIO->midiSetNote(MIDIChannel::Channel10_Percussion, MIDINotes::CSharp2, 100);
 
 					GVector d=dir*Chip[i]->R;
 					Chip[i]->ApplyForce(-d*Chip[i]->ArmEnergy*s,Chip[i]->X);
@@ -6522,7 +6522,7 @@ if( win == FALSE )
 			if(TotalPower>0.1f) {
 				if(!preSound) {
                     // Play a sound (0x9n, pitch, strength, 0) n is the channel (0 to 0xF)
-                    AUDIO->sendMIDIEvent(0x90, 80, 0x1f); // Note On
+                    AUDIO->midiSetNote(MIDIChannel::Channel1, MIDINotes::GSharp5, 31);
 				}
 				preSound=true;
 			}
@@ -6530,7 +6530,8 @@ if( win == FALSE )
 		//		m_fSoundPlayRepeatCountdown=0.0f;
 
                 // Stop the sound (0x9n, pitch, 00,0) n is the channel (0 to 0xF)
-                AUDIO->sendMIDIEvent(0x90, 80, 0); // Note Off
+                //AUDIO->midiSetNoteOn(MIDIChannel::Channel1, 80, 0); // Turns note off by setting strength to 0
+                AUDIO->midiSetNote(MIDIChannel::Channel1, 80, 0, false);
 				preSound=false;
 			}
 		}
@@ -6565,8 +6566,8 @@ if( win == FALSE )
 					int db=(int)(Chip[0]->MaxImpulse/3.0f+0.5f);
 					if(db>0x7f) db=0x7f;
 					if(db>2) {
-                        AUDIO->sendMIDIEvent(0x99, 35, db); // Note On
-                        AUDIO->sendMIDIEvent(0x99, 42, db * 2 / 5); // Note On
+                        AUDIO->midiSetNote(MIDIChannel::Channel10_Percussion, MIDINotes::B1, db);
+                        AUDIO->midiSetNote(MIDIChannel::Channel10_Percussion, MIDINotes::FSharp2, db * 2 / 5);
 						soundCount=2;
 					}
 		//		}
@@ -7480,13 +7481,13 @@ HRESULT CMyD3DApplication::Render()
 				if(nFlag) {
 					soundValue=(int)(0x4f*(noiseMax-0.6f));
 					if(soundValue!=preSoundValue) {
-                        AUDIO->sendMIDIEvent(0xB1, 0x07, soundValue);
+                        AUDIO->midiSetVolume(MIDIChannel::Channel2, soundValue);
 						preSoundValue=soundValue;
 
 					}
 				}
 				else {
-                    AUDIO->sendMIDIEvent(0xB1, 0x07, 0);
+                    AUDIO->midiSetVolume(MIDIChannel::Channel2, 0);
 					preSoundValue=0;
 				}
 			}

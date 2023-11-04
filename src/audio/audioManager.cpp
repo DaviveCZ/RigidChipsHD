@@ -16,14 +16,14 @@ bool AudioManager::Initialize()
 {
     Destroy();
 
-    long msg;
     if(midiOutOpen(&mHMidiOut, (UINT) MIDI_MAPPER, NULL, 0, 0) == 0){
-        //GM system on
-        //Change the tone (0xCn, tone, 0x00) n is the channel (0 to 0xF)
-        sendMIDIEvent(0xC0, 0x7D, 0x00); // Note On
-        sendMIDIEvent(0xC1, 0x7E, 0x00); // Note On
-        sendMIDIEvent(0xB1, 0x07, 0x00); // Note On
-        sendMIDIEvent(0x91, 70, 0x3f); // Note On
+        // Engine Sound
+        midiSetInstrument(MIDIChannel::Channel1, MIDIPatch::Helicopter);
+
+        // Skid Sound
+        midiSetInstrument(MIDIChannel::Channel2, MIDIPatch::Applause);
+        midiSetVolume(MIDIChannel::Channel2, 0);
+        midiSetNote(MIDIChannel::Channel2, MIDINotes::ASharp4, 63);
     }
 
     return true;
@@ -55,4 +55,27 @@ UINT AudioManager::sendMIDIEvent(BYTE bStatus, BYTE bData1, BYTE bData2)
 
     // Send the message.
     return midiOutShortMsg(mHMidiOut, u.dwData);
+}
+
+void AudioManager::midiSetNote(BYTE bChannel, BYTE bNote, BYTE strength, bool on)
+{
+    if (on)
+        sendMIDIEvent(MIDIEvent::NoteOn | bChannel, bNote, strength);
+    else
+        sendMIDIEvent(MIDIEvent::NoteOff | bChannel, bNote, strength);
+}
+
+void AudioManager::midiControlChange(BYTE bChannel, BYTE bController, BYTE bValue)
+{
+    sendMIDIEvent(MIDIEvent::ControlChange | bChannel, bController, bValue);
+}
+
+void AudioManager::midiSetInstrument(BYTE bChannel, BYTE bPatch)
+{
+    sendMIDIEvent(MIDIEvent::ProgramChange | bChannel, bPatch, 0);
+}
+
+void AudioManager::midiSetVolume(BYTE bChannel, BYTE bVolume)
+{
+    midiControlChange(bChannel, 7, bVolume);
 }
