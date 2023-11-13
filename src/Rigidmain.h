@@ -212,6 +212,19 @@ public:
     static HRESULT CALLBACK StaticInputAddDeviceCB( CInputDeviceManager::DeviceInfo* pDeviceInfo, const DIDEVICEINSTANCE* pdidi, LPVOID pParam );   
     BOOL    ConfigureInputDevicesCB( IUnknown* pUnknown );
     static BOOL CALLBACK StaticConfigureInputDevicesCB( IUnknown* pUnknown, VOID* pUserData );
+
+private:
+    void handleRecording();
+    bool showNetworkDlg();
+    bool updateNetworkDlg(DWORD t);
+    void updateChips();
+    void updateCamera(bool mouseWithinWindow);
+    void handleNetworking(DWORD t);
+    void updateCheckpoints();
+    int handleMenusAndHotKeys();
+    void handleGameplayInput();
+    void updateEngineSound();
+    void updateHitSound();
 };
 
 extern int Scroll;
