@@ -43,7 +43,7 @@ extern int GDTSTEP;
 extern int GLOOP;
 extern int LIMITFPS;
 
-int GNETSPAN=190; //200ms is too close to the frame interval*6 (=199.8) (might be networking stuff)
+int GNETSPAN=0; //200ms is too close to the frame interval*6 (=199.8) (networking stuff)
 
 GFloat ARMSPEED=20.0f;
 
@@ -2987,7 +2987,7 @@ void GWorld::DispNetShadow()
 
 	G3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);	// カリングモード
 	G3dDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
-	G3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE,FALSE );
+	G3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE,TRUE );
     G3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
 }
 
